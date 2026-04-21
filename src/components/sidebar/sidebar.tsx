@@ -4,6 +4,7 @@ import { NavUser } from "@/components/nav-user";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import type { AppSidebarConfig } from "@/lib/types/sidebar";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +13,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  config: AppSidebarConfig;
+  name: string;
+};
+
+export function AppSidebar({ config, name, ...props }: AppSidebarProps) {
   const { toggleSidebar, setOpen, open } = useSidebar();
 
   function handleSidebarClick(e: React.MouseEvent<HTMLDivElement>) {
@@ -29,18 +35,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       onClick={handleSidebarClick}
       className={cn(
         !open ? "cursor-e-resize" : "",
-        "overflow-hidden m-1 rounded-2xl border border-white/6 bg-black text-white",
+        "m-1 overflow-hidden rounded-2xl  text-sidebar-foreground",
         "transition-all duration-300 ease-in-out",
-        "shadow-[0_10px_30px_rgba(0,0,0,.6)]",
+        "shadow-sm",
       )}
       {...props}
     >
       <SidebarHeader className=" pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white/5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-sidebar-accent">
               <svg
-                className="h-5 w-5 text-white"
+                className="h-5 w-5 text-sidebar-foreground"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -53,8 +59,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 />
               </svg>
             </div>
-            <span className="font-semibold text-lg group-data-[collapsible=icon]:hidden text-white transition-opacity duration-200 ease-in-out">
-              VorkSpace
+            <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden text-sidebar-foreground transition-opacity duration-200 ease-in-out">
+              {name}
             </span>
           </div>
           <Button
@@ -62,21 +68,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             size="icon"
             onClick={toggleSidebar}
             className={cn(
-              "h-8 w-8 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/6",
+              "h-8 w-8 rounded-lg transition-all duration-200 ease-in-out hover:bg-sidebar-accent",
               open ? "" : "rotate-180",
             )}
           >
-            <ChevronLeft className="h-4 w-4 text-white/90" />
+            <ChevronLeft className="h-4 w-4 text-sidebar-foreground/90" />
           </Button>
         </div>
       </SidebarHeader>
 
       <SidebarContent className="py-2 space-y-2">
-        <SidebarOptions />
+        <SidebarOptions config={config} />
       </SidebarContent>
 
       <SidebarFooter className="mt-auto px-3 py-3 space-y-3">
-        <Button>
+        <Button className="w-full justify-start">
           <Crown className="mr-2 h-4 w-4" />
           Upgrade to Pro
         </Button>

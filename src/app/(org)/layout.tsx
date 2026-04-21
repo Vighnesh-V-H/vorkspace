@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import {
   SidebarInset,
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { sidebarConfigPersonal } from "@/lib/configs/sidebar";
+import { sidebarConfigOrg } from "@/lib/configs/sidebar";
 import {
   Tooltip,
   TooltipContent,
@@ -23,17 +24,35 @@ type ProtectedLayoutProps = {
 
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const pathname = usePathname();
+  const params = useParams();
+  const orgId = params?.id as string;
+
+  const [orgName, setOrgName] = useState<string>("");
+
+  useEffect(() => {
+    if (orgId) {
+      fetch(`/api/organization/${orgId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setOrgName(data.organization.name);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [orgId]);
 
   const routeName = pathname.split("/")[1];
+  const displayName = routeName;
 
   return (
     <TooltipProvider>
       <div className="h-screen flex overflow-hidden">
         <SidebarProvider>
-          <AppSidebar name="vorkspace" config={sidebarConfigPersonal} />
+          <AppSidebar config={sidebarConfigOrg} name={orgName} />
 
           <SidebarInset className="flex flex-col w-full">
-            <header className="flex h-16 bg-[#1e1e1e4e] shrink-0 border-b border-border/40 justify-between items-center gap-2 px-4">
+            <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border/40 bg-background/60 px-4 backdrop-blur-sm">
               <div className="flex items-center gap-2 px-4">
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -49,11 +68,11 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
                   className="mr-2 bg-border h-4"
                 />
 
-                <h1 className="text-lg font-semibold">{routeName}</h1>
+                <h1 className="text-lg font-semibold">{displayName}</h1>
               </div>
             </header>
 
-            <main className="flex-1 overflow-auto p-6 dark:bg-background">
+            <main className="flex-1 overflow-auto bg-background p-6">
               {children}
             </main>
           </SidebarInset>

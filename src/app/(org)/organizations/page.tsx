@@ -1,6 +1,3 @@
-import { db } from "@/db";
-import { organization, organizationMember } from "@/db/schema/organization";
-import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
