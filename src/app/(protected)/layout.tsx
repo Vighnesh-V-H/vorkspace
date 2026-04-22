@@ -16,6 +16,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Link from "next/link";
+import { Bell } from "lucide-react";
 
 type ProtectedLayoutProps = {
   children: React.ReactNode;
@@ -51,6 +53,9 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
 
                 <h1 className="text-lg font-semibold">{routeName}</h1>
               </div>
+              <Link href={"/notifications"}>
+                <Bell />
+              </Link>
             </header>
 
             <main className="flex-1 overflow-auto p-6 dark:bg-background">

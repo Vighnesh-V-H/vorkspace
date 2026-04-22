@@ -23,12 +23,6 @@ export const sidebarConfigPersonal: AppSidebarConfig = {
           icon: Building2Icon,
         },
         {
-          title: "Tickets",
-          url: "/tickets",
-          icon: TicketCheck,
-        },
-
-        {
           title: "Tasks",
           url: "/tasks",
           icon: CheckSquare2,
