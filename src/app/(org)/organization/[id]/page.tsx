@@ -1,35 +1,32 @@
-import { db } from "@/db";
-import { organization, organizationMember } from "@/db/schema/organization";
-import { and, eq } from "drizzle-orm";
-import { auth } from "@/lib/auth/auth";
+"use client";
 
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { getMembershipById } from "@/lib/queries/organization";
+import { useParams, useRouter } from "next/navigation";
+import { useOrganizationByIdQuery } from "@/lib/queries/client/organization";
+import Loader from "@/components/ui/loader";
 
-export default async function OrganizationPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const resolvedParams = await params;
-  const organizationId = resolvedParams.id;
+export default function OrganizationPage() {
+  const params = useParams();
+  const id = params.id as string;
+  const router = useRouter();
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const { data: org, isLoading, error } = useOrganizationByIdQuery(id);
 
-  if (!session?.user) {
-    redirect("/auth/sign-in");
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-5xl">
+        <Loader />
+      </div>
+    );
   }
 
-  const membership = await getMembershipById(organizationId, session.user.id);
-
-  if (!membership || membership.length === 0) {
-    redirect("/dashboard");
+  if (error || !org) {
+    router.push("/dashboard");
+    return (
+      <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-5xl">
+        <Loader />
+      </div>
+    );
   }
-
-  const org = membership[0].organization;
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-5xl">

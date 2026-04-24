@@ -46,7 +46,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
 
   return (
     <TooltipProvider>
-      <div className='h-screen flex overflow-hidden'>
+      <div className="h-screen flex overflow-hidden">
         <SidebarProvider>
           <AppSidebar
             config={sidebarConfigOrg}
@@ -54,12 +54,12 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
             currentOrgId={orgId}
           />
 
-          <SidebarInset className='flex flex-col w-full'>
-            <header className='flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border/40 bg-background/60 px-4 backdrop-blur-sm'>
-              <div className='flex items-center gap-2 px-4'>
+          <SidebarInset className="flex flex-col w-full">
+            <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border/40 bg-background/60 px-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 px-4">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <SidebarTrigger className='-ml-1 md:hidden' />
+                    <SidebarTrigger className="-ml-1 md:hidden" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Toggle sidebar</p>
@@ -67,15 +67,15 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
                 </Tooltip>
 
                 <Separator
-                  orientation='vertical'
-                  className='mr-2 bg-border h-4'
+                  orientation="vertical"
+                  className="mr-2 bg-border h-4"
                 />
 
-                <h1 className='text-lg font-semibold'>{displayName}</h1>
+                <h1 className="text-lg font-semibold">{displayName}</h1>
               </div>
             </header>
 
-            <main className='flex-1 overflow-auto bg-background p-6'>
+            <main className="flex-1 overflow-auto bg-background p-6">
               {children}
             </main>
           </SidebarInset>

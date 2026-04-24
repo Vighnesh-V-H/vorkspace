@@ -46,6 +46,7 @@ export default function SignUp() {
         <div className="hidden lg:block lg:w-1/2 relative bg-zinc-800">
           <Image
             src="/authimg.jpg"
+            loading="eager"
             width={1100}
             height={100}
             alt="Sign In Background"
