@@ -27,14 +27,12 @@ export async function getOrganizationsBySession(session: Session) {
   return userorganization;
 }
 
-export async function getMembershipById(
+export async function getOrganizationByMembership(
   organizationId: string,
   userId: string,
 ) {
-  const membership = await db
-    .select({
-      organization: organization,
-    })
+  const [result] = await db
+    .select()
     .from(organizationMember)
     .innerJoin(
       organization,
@@ -48,9 +46,8 @@ export async function getMembershipById(
     )
     .limit(1);
 
-  return membership;
+  return result ?? null;
 }
-
 export async function getOrganizationById(organizationId: string) {
   const org = await db
     .select({
