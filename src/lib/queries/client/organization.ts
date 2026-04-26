@@ -1,83 +1,38 @@
 "use client";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
-
-export type Organization = {
-  id: string;
-  name: string;
-  email?: string | null;
-};
-
-type OrganizationsResponse = {
-  success: boolean;
-  organizations: Organization[];
-};
-
-type OrganizationResponse = {
-  success: boolean;
-  organization: Organization;
-};
+import type { Organization } from "@/db/schema";
+import { useQuery } from "@tanstack/react-query";
 
 async function fetchOrganizations(): Promise<Organization[]> {
-  const response = await fetch("/api/organization", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
+  const res = await fetch("/api/organization", { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch organizations");
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch organizations");
-  }
+  const data = await res.json();
 
-  const data = (await response.json()) as OrganizationsResponse;
-
-  if (!data.success || !Array.isArray(data.organizations)) {
+  if (!Array.isArray(data.organizations)) {
     throw new Error("Invalid organizations response");
   }
 
   return data.organizations;
 }
 
-async function fetchOrganizationById(orgId: string): Promise<Organization> {
-  const response = await fetch(`/api/organization/${orgId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
+async function fetchOrganizationById(id: string): Promise<Organization> {
+  const res = await fetch(`/api/organization/${id}`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch organization");
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch organization");
-  }
+  const data = await res.json();
+  console.log(data);
+  if (!data) throw new Error("Organization not found");
 
-  const data = (await response.json()) as OrganizationResponse;
-
-  if (!data.success || !data.organization) {
-    throw new Error("Invalid organization response");
-  }
-
-  return data.organization;
+  return data;
 }
 
 export const organizationQueryKeys = {
   all: ["organizations"] as const,
-  detail: (orgId: string) => ["organizations", orgId] as const,
+  detail: (id: string) => ["organizations", id] as const,
 };
 
-export function useOrganizationsQuery(
-  options?: Omit<
-    UseQueryOptions<
-      Organization[],
-      Error,
-      Organization[],
-      readonly ["organizations"]
-    >,
-    "queryKey" | "queryFn"
-  >,
-) {
+export function useOrganizationsQuery(options = {}) {
   return useQuery({
     queryKey: organizationQueryKeys.all,
     queryFn: fetchOrganizations,
@@ -85,21 +40,10 @@ export function useOrganizationsQuery(
   });
 }
 
-export function useOrganizationByIdQuery(
-  orgId: string | undefined,
-  options?: Omit<
-    UseQueryOptions<
-      Organization,
-      Error,
-      Organization,
-      ReturnType<typeof organizationQueryKeys.detail>
-    >,
-    "queryKey" | "queryFn"
-  >,
-) {
+export function useOrganizationByIdQuery(orgId: string, options = {}) {
   return useQuery({
-    queryKey: organizationQueryKeys.detail(orgId ?? ""),
-    queryFn: () => fetchOrganizationById(orgId as string),
+    queryKey: organizationQueryKeys.detail(orgId),
+    queryFn: () => fetchOrganizationById(orgId),
     enabled: Boolean(orgId),
     ...options,
   });

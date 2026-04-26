@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ChevronDown, ChevronLeft, Check, Plus, Building2 } from "lucide-react";
+import { ChevronLeft, Check, Plus, Building2, ChevronDown } from "lucide-react";
 import { SidebarOptions } from "@/components/sidebar/sidebar-option";
 import { NavUser } from "@/components/nav-user";
 import type * as React from "react";
@@ -60,6 +60,7 @@ export function AppSidebar({
   }
 
   const { data: organizations = [] } = useOrganizationsQuery();
+  console.log("orgn\n", organizations);
   const hasOrganizations = organizations.length > 0;
 
   const selectedOrganization =

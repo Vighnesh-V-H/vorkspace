@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
-import { getOrganizationByMembership } from "@/lib/queries/organization";
 import { getCachedOrgMembership } from "@/lib/redis";
 
 export async function GET(
@@ -15,6 +14,7 @@ export async function GET(
     }
 
     const { id } = await params;
+
     if (!id) {
       return NextResponse.json(
         { error: "Invalid organization ID" },
@@ -23,6 +23,7 @@ export async function GET(
     }
 
     const organization = await getCachedOrgMembership(id, session.user.id);
+
     if (!organization) {
       return NextResponse.json(
         { error: "Organization not found or access denied" },

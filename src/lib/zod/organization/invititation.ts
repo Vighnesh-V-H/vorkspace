@@ -1,11 +1,6 @@
 import z from "zod";
 
-export const organizationRoleEnum = [
-  "owner",
-  "admin",
-  "member",
-  "viewer",
-] as const;
+export const organizationRoleEnum = ["admin", "member", "viewer"] as const;
 
 export const inviteMemberSchema = z.object({
   email: z.email("Enter a valid email address"),

@@ -2,6 +2,10 @@ import { db } from "@/db";
 import { organization, organizationMember } from "@/db/schema";
 import { Session } from "better-auth";
 import { and, eq } from "drizzle-orm";
+import {
+  getCachedOrganizationsByUserId,
+  getCachedOrgMembership,
+} from "../redis";
 
 type CreateOrganizationInput = {
   name: string;
@@ -12,7 +16,7 @@ type CreateOrganizationInput = {
   ownerId: string;
 };
 
-export async function getOrganizationsBySession(session: Session) {
+export async function getOrganizationsByUserId(userId: string) {
   const userorganization = await db
     .select({
       organization: organization,
@@ -22,7 +26,7 @@ export async function getOrganizationsBySession(session: Session) {
       organization,
       eq(organizationMember.organizationId, organization.id),
     )
-    .where(eq(organizationMember.userId, session.userId));
+    .where(eq(organizationMember.userId, userId));
 
   return userorganization;
 }
@@ -32,7 +36,7 @@ export async function getOrganizationByMembership(
   userId: string,
 ) {
   const [result] = await db
-    .select()
+    .select({ organization })
     .from(organizationMember)
     .innerJoin(
       organization,
@@ -46,8 +50,9 @@ export async function getOrganizationByMembership(
     )
     .limit(1);
 
-  return result ?? null;
+  return result.organization ?? null;
 }
+
 export async function getOrganizationById(organizationId: string) {
   const org = await db
     .select({
@@ -58,6 +63,23 @@ export async function getOrganizationById(organizationId: string) {
     .limit(1);
 
   return org;
+}
+
+export async function hasOrganizationOwner(
+  organizationId: string,
+): Promise<boolean> {
+  const [owner] = await db
+    .select()
+    .from(organizationMember)
+    .where(
+      and(
+        eq(organizationMember.organizationId, organizationId),
+        eq(organizationMember.role, "owner"),
+      ),
+    )
+    .limit(1);
+
+  return !!owner;
 }
 
 export async function createOrganizationWithOwner({
@@ -81,7 +103,6 @@ export async function createOrganizationWithOwner({
         state,
         zipCode,
       },
-      ownerId,
     })
     .returning();
 

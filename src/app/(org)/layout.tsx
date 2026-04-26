@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useParams } from "next/navigation";
+import { usePathname, useParams, useRouter } from "next/navigation";
 import type React from "react";
 
 import {
@@ -29,7 +29,13 @@ type ProtectedLayoutProps = {
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const pathname = usePathname();
   const params = useParams();
-  const orgId = params?.id as string | undefined;
+  const orgId = params?.id as string;
+
+  const router = useRouter();
+
+  if (!orgId) {
+    router.push("/dashboard");
+  }
 
   const { data: organizations = [] } = useOrganizationsQuery();
   const { data: organization } = useOrganizationByIdQuery(orgId, {

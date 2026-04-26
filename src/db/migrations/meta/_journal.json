@@ -43,6 +43,13 @@
       "when": 1777061072200,
       "tag": "0005_reflective_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777193677058,
+      "tag": "0006_faithful_slipstream",
+      "breakpoints": true
     }
   ]
 }

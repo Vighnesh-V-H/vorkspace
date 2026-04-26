@@ -20,7 +20,7 @@ export default function SignUp() {
   const handleSignUp = async () => {
     setSuccess(false);
     setError(undefined);
-    const data = signUpSchema.safeParse({ email, password });
+    const data = signUpSchema.safeParse({ name, email, password });
     if (!data.success) {
       setError(data.error.issues.at(0)?.message);
       return;

@@ -3,6 +3,8 @@
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useDebounce } from "use-debounce";
+import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +14,6 @@ import {
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-
 import {
   Select,
   SelectContent,
@@ -21,18 +21,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogTrigger,
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+
+import { Combobox, ComboboxOption } from "./combo";
 import { inviteMemberSchema } from "@/lib/zod/organization/invititation";
+import { SearchUser } from "@/lib/types/user/user";
 
 type FormValues = z.infer<typeof inviteMemberSchema>;
 
@@ -44,35 +45,53 @@ export function InviteMemberDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const {
-    register,
     handleSubmit,
     control,
+    watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(inviteMemberSchema),
-    defaultValues: {
-      email: "",
-      role: "member",
-    },
+    defaultValues: { email: "", role: "member" },
   });
 
+  const email = watch("email");
+  const [debounced] = useDebounce(email.trim(), 300);
+
+  const { data = [], isFetching } = useQuery<SearchUser[]>({
+    queryKey: ["invite-users", debounced],
+    queryFn: async ({ signal }) => {
+      const res = await fetch(
+        `/api/users/search?q=${encodeURIComponent(debounced)}`,
+        { signal },
+      );
+      if (!res.ok) throw new Error("Failed to search users");
+      return res.json();
+    },
+    enabled: debounced.length >= 2,
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
+  });
+
+  const emailOptions: ComboboxOption[] = data.map((user) => ({
+    value: user.email,
+    label: user.email,
+    description: user.name ?? undefined,
+  }));
+
   async function submit(values: FormValues) {
-    // try {
-    //   const res = await fetch("/api/organization/invite", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(values),
-    //   });
-    //   if (!res.ok) {
-    //     throw new Error("Failed to send invite");
-    //   }
-    //   reset();
-    //   console.log("Invite sent");
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    try {
+      const res = await fetch("/api/organization/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      if (!res.ok) throw new Error("Failed to send invite");
+      reset();
+      onOpenChange(false);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -89,13 +108,27 @@ export function InviteMemberDialog({
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                placeholder="user@example.com"
-                {...register("email")}
+
+              <Controller
+                control={control}
+                name="email"
+                render={({ field }) => (
+                  <Combobox
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={emailOptions}
+                    isLoading={isFetching}
+                    placeholder="user@example.com"
+                    emptyMessage="No existing users found."
+                    minChars={2}
+                    allowFreeInput // user can type any email, not just suggestions
+                  />
+                )}
               />
 
-              <FieldDescription>Enter the member email.</FieldDescription>
+              <FieldDescription>
+                Search existing users or enter any email.
+              </FieldDescription>
 
               {errors.email && <FieldError>{errors.email.message}</FieldError>}
             </Field>
@@ -111,9 +144,7 @@ export function InviteMemberDialog({
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
-
                     <SelectContent>
-                      <SelectItem value="owner">Owner</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="member">Member</SelectItem>
                       <SelectItem value="viewer">Viewer</SelectItem>
@@ -132,9 +163,8 @@ export function InviteMemberDialog({
                 Cancel
               </Button>
             </DialogClose>
-
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Sending..." : "Send Invite"}
+              {isSubmitting ? "Sending…" : "Send Invite"}
             </Button>
           </DialogFooter>
         </form>

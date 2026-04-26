@@ -3,8 +3,9 @@ import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 import {
   createOrganizationWithOwner,
-  getOrganizationsBySession,
+  getOrganizationsByUserId,
 } from "@/lib/queries/organization";
+import { getCachedOrganizationsByUserId } from "@/lib/redis";
 
 export async function GET() {
   try {
@@ -16,11 +17,12 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userOrganizations = await getOrganizationsBySession(session.session);
+    const userOrganizations = await getCachedOrganizationsByUserId(
+      session.session.userId,
+    );
 
     return NextResponse.json(
       {
-        success: true,
         organizations: userOrganizations.map(
           ({ organization }) => organization,
         ),

@@ -11,6 +11,8 @@ export default function OrganizationPage() {
 
   const { data: org, isLoading, error } = useOrganizationByIdQuery(id);
 
+  console.log(org);
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-5xl">

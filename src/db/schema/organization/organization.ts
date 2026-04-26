@@ -33,22 +33,13 @@ export const organization = pgTable(
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     address: jsonb("address"),
-    ownerId: text("owner_id")
-      .notNull()
-      .references(() => user.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
     createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updatedAt", { withTimezone: true })
       .defaultNow()
       .$onUpdate(() => new Date()),
     deletedAt: timestamp("deletedAt", { withTimezone: true }),
   },
-  (t) => [
-    uniqueIndex("organization_email_unique").on(t.email),
-    index("organization_owner_idx").on(t.ownerId),
-  ],
+  (t) => [uniqueIndex("organization_email_unique").on(t.email)],
 );
 
 export const organizationMember = pgTable(
@@ -129,12 +120,3 @@ export type NewOrganizationInvitation =
 export type OrganizationRole = (typeof organizationRoleEnum.enumValues)[number];
 
 export type InvitationStatus = (typeof invitationStatusEnum.enumValues)[number];
-
-export function isInvitationActive(
-  invitation: OrganizationInvitation,
-): boolean {
-  return (
-    invitation.status === "pending" &&
-    new Date(invitation.expiresAt) > new Date()
-  );
-}
