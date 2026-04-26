@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 import { createTicket, getTicketsByOrganization } from "@/lib/queries/ticket";
 import { createTicketSchema } from "@/lib/zod/ticket";
+import { sendNotification } from "@/lib/notifications";
 
 export async function GET(
   _req: NextRequest,
@@ -66,6 +67,17 @@ export async function POST(
       assignedTo: parsed.data.assignedTo,
       createdBy: session.user.id,
     });
+
+    if (parsed.data.assignedTo && parsed.data.assignedTo !== session.user.id) {
+      await sendNotification({
+        userId: parsed.data.assignedTo,
+        organizationId: parsed.data.organizationId,
+        entityId: newTicket.id.toString(),
+        entityType: "ticket",
+        title: "New Ticket Assigned",
+        message: `You have been assigned to a new ticket: ${newTicket.title}`,
+      });
+    }
 
     return NextResponse.json(
       { success: true, ticket: newTicket },

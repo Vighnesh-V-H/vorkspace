@@ -50,7 +50,7 @@ export function AppSidebar({
   const router = useRouter();
   const pathName = usePathname();
 
-  const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const [inviteOrgId, setInviteOrgId] = useState<string | null>(null);
 
   function handleSidebarClick(e: React.MouseEvent<HTMLDivElement>) {
     e.stopPropagation();
@@ -147,7 +147,7 @@ export function AppSidebar({
                             className="hover:bg-[#111]"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setShowInviteDialog(true);
+                              setInviteOrgId(org.id);
                             }}
                           >
                             Invite members
@@ -215,10 +215,13 @@ export function AppSidebar({
       </Sidebar>
 
       {/* Render dialog at root level, controlled by state */}
-      <InviteMemberDialog
-        open={showInviteDialog}
-        onOpenChange={setShowInviteDialog}
-      />
+      {inviteOrgId && (
+        <InviteMemberDialog
+          open={!!inviteOrgId}
+          onOpenChange={(open) => !open && setInviteOrgId(null)}
+          organizationId={inviteOrgId}
+        />
+      )}
     </>
   );
 }

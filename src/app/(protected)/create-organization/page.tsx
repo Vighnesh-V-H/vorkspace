@@ -45,7 +45,7 @@ export default function CreateOrganizationPage() {
       }
 
       const data = await response.json();
-      console.log("Organization created successfully:", data);
+   
       toast.success("Organization created successfully");
       router.push("/dashboard");
     } catch (error) {

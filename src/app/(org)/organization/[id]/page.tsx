@@ -11,7 +11,7 @@ export default function OrganizationPage() {
 
   const { data: org, isLoading, error } = useOrganizationByIdQuery(id);
 
-  console.log(org);
+  console.log("org",org);
 
   if (isLoading) {
     return (

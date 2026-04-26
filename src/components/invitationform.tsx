@@ -40,9 +40,11 @@ type FormValues = z.infer<typeof inviteMemberSchema>;
 export function InviteMemberDialog({
   open,
   onOpenChange,
+  organizationId,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  organizationId: string;
 }) {
   const {
     handleSubmit,
@@ -81,7 +83,7 @@ export function InviteMemberDialog({
 
   async function submit(values: FormValues) {
     try {
-      const res = await fetch("/api/organization/invite", {
+      const res = await fetch(`/api/organization/${organizationId}/invite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),

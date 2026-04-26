@@ -9,6 +9,7 @@ async function fetchOrganizations(): Promise<Organization[]> {
 
   const data = await res.json();
 
+
   if (!Array.isArray(data.organizations)) {
     throw new Error("Invalid organizations response");
   }
@@ -21,7 +22,7 @@ async function fetchOrganizationById(id: string): Promise<Organization> {
   if (!res.ok) throw new Error("Failed to fetch organization");
 
   const data = await res.json();
-  console.log(data);
+  console.log("data",data);
   if (!data) throw new Error("Organization not found");
 
   return data;

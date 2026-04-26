@@ -50,6 +50,13 @@
       "when": 1777193677058,
       "tag": "0006_faithful_slipstream",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1777236889764,
+      "tag": "0007_flippant_puppet_master",
+      "breakpoints": true
     }
   ]
 }
