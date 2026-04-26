@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
-import {
-  createOrganizationWithOwner,
-  getOrganizationsByUserId,
-} from "@/lib/queries/organization";
+import { createOrganizationWithOwner } from "@/lib/queries/organization";
 import { getCachedOrganizationsByUserId } from "@/lib/redis";
 
 export async function GET() {

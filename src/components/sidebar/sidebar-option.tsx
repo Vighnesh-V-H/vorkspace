@@ -14,10 +14,18 @@ import { usePathname } from "next/navigation";
 
 type SidebarOptionsProps = {
   config: AppSidebarConfig;
+  currentOrgId?: string;
 };
 
-export function SidebarOptions({ config }: SidebarOptionsProps) {
+export function SidebarOptions({ config, currentOrgId }: SidebarOptionsProps) {
   const pathname = usePathname();
+
+  function resolveUrl(url: string) {
+    if (currentOrgId) {
+      return url.replace(":orgId", currentOrgId);
+    }
+    return url;
+  }
 
   return (
     <>
@@ -32,11 +40,12 @@ export function SidebarOptions({ config }: SidebarOptionsProps) {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {section.items.map((item) => {
+                const resolvedUrl = resolveUrl(item.url);
                 const isActive =
-                  item.url === "/"
+                  resolvedUrl === "/"
                     ? pathname === "/"
-                    : pathname === item.url ||
-                      pathname.startsWith(`${item.url}/`);
+                    : pathname === resolvedUrl ||
+                      pathname.startsWith(`${resolvedUrl}/`);
 
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -49,7 +58,7 @@ export function SidebarOptions({ config }: SidebarOptionsProps) {
                           "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
                       )}
                     >
-                      <Link href={item.url}>
+                      <Link href={resolvedUrl}>
                         <item.icon className="h-5 w-5 shrink-0" />
                         <span className="group-data-[collapsible=icon]:hidden">
                           {item.title}

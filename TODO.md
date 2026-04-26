@@ -1,5 +1,5 @@
-[] remove ownerid
-[]ticket api 
+[✅] remove ownerid
+[] ticket api 
 [] notification api
 [] notification ui
 [] some ui fix

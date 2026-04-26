@@ -194,7 +194,7 @@ export function AppSidebar({
         </SidebarHeader>
 
         <SidebarContent className="py-2 space-y-2">
-          <SidebarOptions config={config} />
+          <SidebarOptions config={config} currentOrgId={currentOrgId} />
         </SidebarContent>
 
         <SidebarFooter className="mt-auto px-3 py-3 space-y-3">

@@ -55,7 +55,7 @@ export const sidebarConfigOrg: AppSidebarConfig = {
         },
         {
           title: "Tickets",
-          url: "/tickets",
+          url: "/organization/:orgId/tickets",
           icon: TicketCheck,
         },
 
