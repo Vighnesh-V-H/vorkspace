@@ -75,7 +75,9 @@ export const organizationMember = pgTable(
 export const organizationInvitation = pgTable(
   "organization_invitation",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, {

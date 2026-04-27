@@ -23,28 +23,28 @@ export async function POST(
     const { email, role } = body;
 
     if (!email) {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    // Check if the current user has permission to invite
-    const membership = await getOrganizationMembership(organizationId, session.user.id);
+    const membership = await getOrganizationMembership(
+      organizationId,
+      session.user.id,
+    );
 
-    if (!membership || (membership.role !== "admin" && membership.role !== "owner")) {
+    if (
+      !membership ||
+      (membership.role !== "admin" && membership.role !== "owner")
+    ) {
       return NextResponse.json(
         { error: "You don't have permission to invite members" },
         { status: 403 },
       );
     }
 
-    // Check if user exists
     const invitedUser = await getUserByEmail(email);
 
-    // Create the invitation
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // expires in 7 days
+    expiresAt.setDate(expiresAt.getDate() + 7);
 
     const inviteId = crypto.randomUUID();
 
@@ -58,7 +58,6 @@ export async function POST(
       invitedBy: session.user.id,
     });
 
-    // If the user is already registered on our platform, send them a real-time notification
     if (invitedUser) {
       await sendNotification({
         userId: invitedUser.id,
@@ -71,10 +70,11 @@ export async function POST(
     }
 
     return NextResponse.json({ success: true }, { status: 201 });
+    // @ts-expect-error eerror
   } catch (error: any) {
     console.error("Error creating invitation:", error);
-    if (error.code === '23505') { // Unique violation
-       return NextResponse.json(
+    if (error.code === "23505") {
+      return NextResponse.json(
         { error: "Invitation already sent to this email" },
         { status: 400 },
       );

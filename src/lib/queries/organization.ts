@@ -2,10 +2,6 @@ import { db } from "@/db";
 import { organization, organizationMember } from "@/db/schema";
 import { Session } from "better-auth";
 import { and, eq } from "drizzle-orm";
-import {
-  getCachedOrganizationsByUserId,
-  getCachedOrgMembership,
-} from "../redis";
 
 type CreateOrganizationInput = {
   name: string;

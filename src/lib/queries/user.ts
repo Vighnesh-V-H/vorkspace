@@ -1,3 +1,4 @@
+import { inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { user } from "@/db/schema/auth/user";
 import { or, ilike, eq } from "drizzle-orm";
@@ -18,9 +19,21 @@ export async function searchUsers(q: string) {
 }
 
 export async function getUserByEmail(email: string) {
-  const [result] = await db
+  const [result] = await db.select().from(user).where(eq(user.email, email));
+  return result;
+}
+
+export async function getUsersByEmails(emails: string[]) {
+  if (!emails || emails.length === 0) {
+    return [];
+  }
+
+  const lowercasedEmails = emails.map((email) => email.toLowerCase());
+
+  const result = await db
     .select()
     .from(user)
-    .where(eq(user.email, email));
+    .where(inArray(user.email, lowercasedEmails));
+
   return result;
 }

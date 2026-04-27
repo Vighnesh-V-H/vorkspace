@@ -18,7 +18,6 @@ export async function GET() {
       session.session.userId,
     );
 
-
     return NextResponse.json(
       {
         organizations: userOrganizations.map(
