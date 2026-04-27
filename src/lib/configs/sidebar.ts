@@ -4,6 +4,7 @@ import {
   CheckSquare2,
   FileText,
   LayoutDashboard,
+  MessageSquare,
   TicketCheck,
 } from "lucide-react";
 
@@ -58,7 +59,6 @@ export const sidebarConfigOrg: AppSidebarConfig = {
           url: "/organization/:orgId/tickets",
           icon: TicketCheck,
         },
-
         {
           title: "Tasks",
           url: "/tasks",

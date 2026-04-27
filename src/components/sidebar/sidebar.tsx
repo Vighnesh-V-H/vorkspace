@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 
-import { ChevronLeft, Check, Plus, Building2, ChevronDown } from "lucide-react";
+import {
+  ChevronLeft,
+  Check,
+  Plus,
+  Building2,
+  ChevronDown,
+  MessageSquare,
+  Trash2,
+} from "lucide-react";
 import { SidebarOptions } from "@/components/sidebar/sidebar-option";
 import { NavUser } from "@/components/nav-user";
 import type * as React from "react";
@@ -27,6 +35,18 @@ import {
 } from "@/components/ui/sidebar";
 import { useOrganizationsQuery } from "@/lib/queries/client/organization";
 import { InviteMemberDialog } from "../invitationform";
+import {
+  useChatSessionsQuery,
+  useDeleteChatSession,
+} from "@/lib/queries/client/chat";
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
 
 type OrganizationOption = {
   id: string;
@@ -195,6 +215,9 @@ export function AppSidebar({
 
         <SidebarContent className="py-2 space-y-2">
           <SidebarOptions config={config} currentOrgId={currentOrgId} />
+          {currentOrgId && (
+            <ChatHistorySection orgId={currentOrgId} />
+          )}
         </SidebarContent>
 
         <SidebarFooter className="mt-auto px-3 py-3 space-y-3">
@@ -223,5 +246,60 @@ export function AppSidebar({
         />
       )}
     </>
+  );
+}
+
+function ChatHistorySection({ orgId }: { orgId: string }) {
+  const { data: sessions = [] } = useChatSessionsQuery(orgId);
+  const deleteSession = useDeleteChatSession(orgId);
+  const pathname = usePathname();
+  const recentSessions = sessions.slice(0, 10);
+
+  if (recentSessions.length === 0) return null;
+
+  return (
+    <SidebarGroup className="mt-4 group-data-[collapsible=icon]:hidden">
+      <SidebarGroupLabel className="text-[10px] font-medium text-sidebar-foreground/60 uppercase tracking-[0.12em] mb-2 px-3">
+        Recent Chats
+      </SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu className="space-y-0.5">
+          {recentSessions.map((s) => {
+            const url = `/organization/${orgId}/chat/${s.id}`;
+            const isActive = pathname === url;
+            return (
+              <SidebarMenuItem key={s.id}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={isActive}
+                  className={cn(
+                    "group/chat-item",
+                    isActive &&
+                      "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
+                  )}
+                >
+                  <Link href={url}>
+                    <MessageSquare className="h-4 w-4 shrink-0" />
+                    <span className="truncate flex-1 text-xs">
+                      {s.title}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        deleteSession.mutate(s.id);
+                      }}
+                      className="opacity-0 group-hover/chat-item:opacity-100 transition-opacity shrink-0 p-0.5 rounded hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                    </button>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
   );
 }

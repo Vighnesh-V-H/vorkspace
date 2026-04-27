@@ -70,10 +70,10 @@ export async function POST(
     }
 
     return NextResponse.json({ success: true }, { status: 201 });
-    // @ts-expect-error eerror
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { code?: string };
     console.error("Error creating invitation:", error);
-    if (error.code === "23505") {
+    if (err.code === "23505") {
       return NextResponse.json(
         { error: "Invitation already sent to this email" },
         { status: 400 },

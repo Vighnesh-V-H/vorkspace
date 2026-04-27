@@ -1,6 +1,8 @@
 import { inviteMemberSchema } from "@/lib/zod/tools/invite";
 import { tool } from "ai";
 
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const inviteMemberTool = tool({
   description: "Invite a user to an organization by email",
 
@@ -8,7 +10,7 @@ export const inviteMemberTool = tool({
 
   execute: async ({ organizationId, email, role }) => {
     const res = await fetch(
-      `/api/organizations/${organizationId}/invitations`,
+      `${BASE_URL}/api/organization/${organizationId}/invite`,
       {
         method: "POST",
         headers: {

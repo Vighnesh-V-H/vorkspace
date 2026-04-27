@@ -4,6 +4,7 @@ export type SidebarIconName =
   | "layoutDashboard"
   | "building2"
   | "ticketCheck"
+  | "messageSquare"
   | "checkSquare2"
   | "fileText";
 
