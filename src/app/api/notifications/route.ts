@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
-import { db } from "@/db";
-import { notification } from "@/db/schema";
-import { desc, eq, and } from "drizzle-orm";
+import { getCachedNotificationsByUserId } from "@/lib/redis";
+import { markAllNotificationsRead, markNotificationRead } from "@/lib/queries/notification";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,12 +14,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const notifications = await db
-      .select()
-      .from(notification)
-      .where(eq(notification.userId, session.user.id))
-      .orderBy(desc(notification.createdAt))
-      .limit(50);
+    const notifications = await getCachedNotificationsByUserId(session.user.id);
 
     return NextResponse.json({ notifications }, { status: 200 });
   } catch (error) {
@@ -45,27 +39,11 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     
     if (body.action === "mark_all_read") {
-      await db
-        .update(notification)
-        .set({ isRead: true })
-        .where(
-          and(
-            eq(notification.userId, session.user.id),
-            eq(notification.isRead, false)
-          )
-        );
+      await markAllNotificationsRead(session.user.id);
       
       return NextResponse.json({ success: true }, { status: 200 });
     } else if (body.notificationId) {
-      await db
-        .update(notification)
-        .set({ isRead: true })
-        .where(
-          and(
-            eq(notification.id, body.notificationId),
-            eq(notification.userId, session.user.id)
-          )
-        );
+      await markNotificationRead(session.user.id, body.notificationId);
         
       return NextResponse.json({ success: true }, { status: 200 });
     }

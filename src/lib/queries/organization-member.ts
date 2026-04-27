@@ -28,3 +28,20 @@ export async function searchOrganizationMembers(
 
   return results;
 }
+
+export async function getOrganizationMembership(
+  organizationId: string,
+  userId: string,
+) {
+  const [membership] = await db
+    .select()
+    .from(organizationMember)
+    .where(
+      and(
+        eq(organizationMember.organizationId, organizationId),
+        eq(organizationMember.userId, userId),
+      ),
+    );
+  
+  return membership;
+}

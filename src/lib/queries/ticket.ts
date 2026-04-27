@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { ticket } from "@/db/schema";
 import { user } from "@/db/schema/auth/user";
 import { eq } from "drizzle-orm";
+import { invalidateTicketsCache } from "../redis";
 
 type CreateTicketInput = {
   title: string;
@@ -26,6 +27,7 @@ export async function createTicket(input: CreateTicketInput) {
     })
     .returning();
 
+  await invalidateTicketsCache(input.organizationId);
   return newTicket;
 }
 

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
-import { createTicket, getTicketsByOrganization } from "@/lib/queries/ticket";
+import { createTicket } from "@/lib/queries/ticket";
+import { getCachedTicketsByOrganization } from "@/lib/redis";
 import { createTicketSchema } from "@/lib/zod/ticket";
 import { sendNotification } from "@/lib/notifications";
 
@@ -19,7 +20,7 @@ export async function GET(
     }
 
     const { id: organizationId } = await params;
-    const tickets = await getTicketsByOrganization(organizationId);
+    const tickets = await getCachedTicketsByOrganization(organizationId);
 
     return NextResponse.json({ tickets }, { status: 200 });
   } catch (error) {

@@ -1,6 +1,5 @@
-import { db } from "@/db";
-import { notification } from "@/db/schema/notification";
 import { redis } from "@/lib/redis";
+import { createNotification } from "./queries/notification";
 
 type SendNotificationParams = {
   userId: string;
@@ -14,13 +13,10 @@ type SendNotificationParams = {
 export async function sendNotification(params: SendNotificationParams) {
   const id = crypto.randomUUID();
 
-  const [newNotification] = await db
-    .insert(notification)
-    .values({
-      id,
-      ...params,
-    })
-    .returning();
+  const newNotification = await createNotification({
+    id,
+    ...params,
+  });
 
   await redis.publish(
     `notifications:${params.userId}`,

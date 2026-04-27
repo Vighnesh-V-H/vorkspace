@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { user } from "@/db/schema/auth/user";
-import { or, ilike } from "drizzle-orm";
+import { or, ilike, eq } from "drizzle-orm";
 
 export async function searchUsers(q: string) {
   const results = await db
@@ -15,4 +15,12 @@ export async function searchUsers(q: string) {
     .limit(10);
 
   return results;
+}
+
+export async function getUserByEmail(email: string) {
+  const [result] = await db
+    .select()
+    .from(user)
+    .where(eq(user.email, email));
+  return result;
 }

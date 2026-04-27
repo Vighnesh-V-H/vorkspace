@@ -1,14 +1,20 @@
 import Redis from "ioredis";
 import {
+  NOTIFICATIONS_CACHE_PREFIX,
+  NOTIFICATIONS_CACHE_TTL,
   ORG_CACHE_PREFIX,
   ORG_CACHE_TTL,
   ORG_USER_CACHE_PREFIX,
+  TICKETS_CACHE_PREFIX,
+  TICKETS_CACHE_TTL,
 } from "./consts/keys";
 import {
   getOrganizationByMembership,
   getOrganizationsByUserId,
 } from "./queries/organization";
-import { Organization } from "@/db/schema";
+import { getNotificationsByUserId } from "./queries/notification";
+import { getTicketsByOrganization } from "./queries/ticket";
+import { Notification, Organization } from "@/db/schema";
 
 export const redis = new Redis(process.env.REDIS_URL!);
 
@@ -48,4 +54,34 @@ export async function invalidateOrgMembershipCache(
 
 export async function invalidateUserOrganizationsCache(userId: string) {
   await redis.del(`${ORG_USER_CACHE_PREFIX}${userId}`);
+}
+
+export async function getCachedNotificationsByUserId(
+  userId: string,
+): Promise<Notification[]> {
+  const key = `${NOTIFICATIONS_CACHE_PREFIX}${userId}`;
+  const cached = await redis.get(key);
+  if (cached !== null) return JSON.parse(cached);
+  const data = await getNotificationsByUserId(userId);
+  await redis.set(key, JSON.stringify(data), "EX", NOTIFICATIONS_CACHE_TTL);
+  return data;
+}
+
+export async function invalidateNotificationsCache(userId: string) {
+  await redis.del(`${NOTIFICATIONS_CACHE_PREFIX}${userId}`);
+}
+
+export async function getCachedTicketsByOrganization(
+  organizationId: string,
+) {
+  const key = `${TICKETS_CACHE_PREFIX}${organizationId}`;
+  const cached = await redis.get(key);
+  if (cached !== null) return JSON.parse(cached);
+  const data = await getTicketsByOrganization(organizationId);
+  await redis.set(key, JSON.stringify(data), "EX", TICKETS_CACHE_TTL);
+  return data;
+}
+
+export async function invalidateTicketsCache(organizationId: string) {
+  await redis.del(`${TICKETS_CACHE_PREFIX}${organizationId}`);
 }

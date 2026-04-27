@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
-import { db } from "@/db";
-import { organizationInvitation, organizationMember, user } from "@/db/schema";
 import { sendNotification } from "@/lib/notifications";
-import { eq, and } from "drizzle-orm";
-
+import { getOrganizationMembership } from "@/lib/queries/organization-member";
+import { getUserByEmail } from "@/lib/queries/user";
+import { createOrganizationInvitation } from "@/lib/queries/invitation";
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -31,15 +30,7 @@ export async function POST(
     }
 
     // Check if the current user has permission to invite
-    const [membership] = await db
-      .select()
-      .from(organizationMember)
-      .where(
-        and(
-          eq(organizationMember.organizationId, organizationId),
-          eq(organizationMember.userId, session.user.id),
-        ),
-      );
+    const membership = await getOrganizationMembership(organizationId, session.user.id);
 
     if (!membership || (membership.role !== "admin" && membership.role !== "owner")) {
       return NextResponse.json(
@@ -49,10 +40,7 @@ export async function POST(
     }
 
     // Check if user exists
-    const [invitedUser] = await db
-      .select()
-      .from(user)
-      .where(eq(user.email, email));
+    const invitedUser = await getUserByEmail(email);
 
     // Create the invitation
     const expiresAt = new Date();
@@ -60,7 +48,7 @@ export async function POST(
 
     const inviteId = crypto.randomUUID();
 
-    await db.insert(organizationInvitation).values({
+    await createOrganizationInvitation({
       id: inviteId,
       organizationId,
       email,

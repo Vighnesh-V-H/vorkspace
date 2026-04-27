@@ -4,6 +4,7 @@ export default defineConfig({
   dialect: "postgresql",
   schema: "./src/db/schema/index.ts",
   out: "./src/db/migrations",
+  breakpoints: true,
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
