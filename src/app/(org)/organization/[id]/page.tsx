@@ -3,6 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useOrganizationByIdQuery } from "@/lib/queries/client/organization";
 import Loader from "@/components/ui/loader";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function OrganizationPage() {
   const params = useParams();
@@ -11,7 +13,7 @@ export default function OrganizationPage() {
 
   const { data: org, isLoading, error } = useOrganizationByIdQuery(id);
 
-  console.log("org",org);
+  console.log("org", org);
 
   if (isLoading) {
     return (
@@ -39,10 +41,13 @@ export default function OrganizationPage() {
 
       <div className="p-8 border rounded-xl bg-card shadow-sm">
         <h2 className="text-xl font-semibold mb-4">Organization Details</h2>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mb-6">
           Welcome to the {org.name} organization dashboard. You can manage
           organization settings and members here.
         </p>
+        <Link href={`/organization/${id}/settings`}>
+          <Button variant="outline">Organization Settings</Button>
+        </Link>
       </div>
     </div>
   );

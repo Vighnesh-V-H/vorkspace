@@ -42,6 +42,44 @@ export async function getOrganizationMembership(
         eq(organizationMember.userId, userId),
       ),
     );
-  
+
   return membership;
+}
+
+export async function getOrganizationMemberRole(
+  organizationId: string,
+  userId: string,
+) {
+  const [membership] = await db
+    .select({ role: organizationMember.role })
+    .from(organizationMember)
+    .where(
+      and(
+        eq(organizationMember.organizationId, organizationId),
+        eq(organizationMember.userId, userId),
+      ),
+    );
+
+  return membership?.role ?? null;
+}
+
+export async function getAllOrganizationMembers(organizationId: string) {
+  const members = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      role: organizationMember.role,
+    })
+    .from(organizationMember)
+    .innerJoin(user, eq(organizationMember.userId, user.id))
+    .where(
+      and(
+        eq(organizationMember.organizationId, organizationId),
+        isNull(organizationMember.removedAt),
+      ),
+    );
+
+  return members;
 }

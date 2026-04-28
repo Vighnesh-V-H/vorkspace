@@ -111,3 +111,25 @@ export async function createOrganizationWithOwner({
 
   return newOrganization;
 }
+
+export async function updateOrganization(
+  organizationId: string,
+  data: { name: string },
+) {
+  const [updatedOrganization] = await db
+    .update(organization)
+    .set(data)
+    .where(eq(organization.id, organizationId))
+    .returning();
+
+  return updatedOrganization;
+}
+
+export async function deleteOrganization(organizationId: string) {
+  const [deletedOrganization] = await db
+    .delete(organization)
+    .where(eq(organization.id, organizationId))
+    .returning();
+
+  return deletedOrganization;
+}
