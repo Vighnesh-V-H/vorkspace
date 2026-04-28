@@ -5,11 +5,12 @@ import { Message } from "@/components/ui/message";
 import { authClient } from "@/lib/auth/auth-client";
 import { signInSchema } from "@/lib/zod/auth/schema";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function SignIn() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("test@email.com");
+  const [password, setPassword] = useState<string>("123456789");
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<boolean>(false);
 
@@ -82,6 +83,15 @@ export default function SignIn() {
               </div>
 
               <div className="pt-2">
+                <div className="text-sm text-zinc-400 text-center mb-4">
+                  Don't have an account?{" "}
+                  <Link
+                    href="/auth/signup"
+                    className="text-white hover:underline"
+                  >
+                    Sign up
+                  </Link>
+                </div>
                 {error && <Message type="error">{error}</Message>}
                 {success && (
                   <Message type="success">

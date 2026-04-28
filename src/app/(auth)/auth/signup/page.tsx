@@ -5,6 +5,7 @@ import { Message } from "@/components/ui/message";
 import { authClient } from "@/lib/auth/auth-client";
 import { signUpSchema } from "@/lib/zod/auth/schema";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -56,9 +57,11 @@ export default function SignUp() {
         </div>
         <div className="w-full lg:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
           <div className="max-w-md w-full mx-auto">
-            <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Create an account
+            </h1>
             <p className="text-zinc-400 mb-8 text-sm">
-              Please enter your details to sign in.
+              Please enter your details to sign up.
             </p>
 
             <form className="space-y-5">
@@ -101,6 +104,15 @@ export default function SignUp() {
               </div>
 
               <div className="pt-2">
+                <div className="text-sm text-zinc-400 text-center mb-4">
+                  Already have an account?{" "}
+                  <Link
+                    href="/auth/signin"
+                    className="text-white hover:underline"
+                  >
+                    Sign in
+                  </Link>
+                </div>
                 {error && <Message type="error">{error}</Message>}
                 {success && (
                   <Message type="success">

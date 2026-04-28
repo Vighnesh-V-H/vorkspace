@@ -215,9 +215,7 @@ export function AppSidebar({
 
         <SidebarContent className="py-2 space-y-2">
           <SidebarOptions config={config} currentOrgId={currentOrgId} />
-          {currentOrgId && (
-            <ChatHistorySection orgId={currentOrgId} />
-          )}
+          {currentOrgId && <ChatHistorySection orgId={currentOrgId} />}
         </SidebarContent>
 
         <SidebarFooter className="mt-auto px-3 py-3 space-y-3">
@@ -259,11 +257,11 @@ function ChatHistorySection({ orgId }: { orgId: string }) {
 
   return (
     <SidebarGroup className="mt-4 group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel className="text-[10px] font-medium text-sidebar-foreground/60 uppercase tracking-[0.12em] mb-2 px-3">
+      {/*<SidebarGroupLabel className="text-[10px] font-medium text-sidebar-foreground/60 uppercase tracking-[0.12em] mb-2 px-3">
         Recent Chats
-      </SidebarGroupLabel>
+      </SidebarGroupLabel>*/}
       <SidebarGroupContent>
-        <SidebarMenu className="space-y-0.5">
+        {/*<SidebarMenu className="space-y-0.5">
           {recentSessions.map((s) => {
             const url = `/organization/${orgId}/chat/${s.id}`;
             const isActive = pathname === url;
@@ -298,7 +296,7 @@ function ChatHistorySection({ orgId }: { orgId: string }) {
               </SidebarMenuItem>
             );
           })}
-        </SidebarMenu>
+        </SidebarMenu>*/}
       </SidebarGroupContent>
     </SidebarGroup>
   );
